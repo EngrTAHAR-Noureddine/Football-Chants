@@ -18,6 +18,7 @@ class ChantsViewController: UIViewController {
         tv.estimatedRowHeight = 44
         tv.separatorStyle = .none
         tv.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tv.register(TeamTableViewCell.self, forCellReuseIdentifier: TeamTableViewCell.cellId)
         return tv
     }()
     
@@ -30,13 +31,14 @@ class ChantsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = .blue
+        self.view.backgroundColor = .white
     }
 }
 
 private extension ChantsViewController {
     func setup(){
-        
+        self.navigationController?.navigationBar.topItem?.title = "Football Chants"
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         tableView.dataSource = self
         
         self.view.addSubview(tableView)
@@ -45,31 +47,19 @@ private extension ChantsViewController {
             tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
-
+            tableView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
 }
 
 extension ChantsViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        
-        switch indexPath.row{
-        case 0:
-            cell.backgroundColor = .red
-        case 1:
-            cell.backgroundColor = .green
-        case 2:
-            cell.backgroundColor = .black
-        default:
-            break
-        }
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: TeamTableViewCell.cellId, for: indexPath ) as! TeamTableViewCell
+        cell.configure()
         return cell
     }
     
