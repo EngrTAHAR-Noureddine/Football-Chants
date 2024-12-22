@@ -9,6 +9,9 @@ import UIKit
 
 class ChantsViewController: UIViewController {
     
+    private lazy var teamsViewModel = TeamsViewModel()
+    private lazy var audioManagerViewModel = AudioManagerViewModel()
+    
     // MARK: UI
     private lazy var tableView: UITableView = {
         let tv = UITableView()
@@ -54,14 +57,24 @@ private extension ChantsViewController {
 
 extension ChantsViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return teamsViewModel.teams.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let team = teamsViewModel.teams[indexPath.row]
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: TeamTableViewCell.cellId, for: indexPath ) as! TeamTableViewCell
-        cell.configure()
+        cell.configure(with: team, delegate: self)
         return cell
     }
+}
+
+extension ChantsViewController : TeamTableViewCellDelegate {
     
+    func didTapPlayback(for team: Team){
+        audioManagerViewModel.playback(team)
+        teamsViewModel.togglePlayback(for: team)
+        tableView.reloadData()
+    }
     
 }

@@ -6,6 +6,10 @@
 //
 import UIKit
 
+protocol TeamTableViewCellDelegate : class {
+    func didTapPlayback(for team: Team)
+}
+
 class TeamTableViewCell: UITableViewCell {
     static let cellId = "TeamTableViewCell"
     
@@ -80,17 +84,32 @@ class TeamTableViewCell: UITableViewCell {
         containerVw.layer.cornerRadius = 10
     }
     
-    func configure() {
+    override func prepareForReuse(){
+        super.prepareForReuse()
+        self.delegate = nil
+        self.team = nil
+        self.contentView.subviews.forEach{ $0.removeFromSuperview() }
+    }
+    
+    private weak var delegate: TeamTableViewCellDelegate?
+    private var team: Team?
+    
+    func configure(with team: Team, delegate: TeamTableViewCellDelegate) {
         
-        containerVw.backgroundColor = TeamType.arsenal.background
+        self.delegate = delegate
+        self.team = team
         
-        badgeImgVw.image = TeamType.arsenal.badge
-        playbackBtn.setImage(UIImage(systemName: "play.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 32)), for: .normal)
+        playbackBtn.addTarget(self, action: #selector(didTapPlayback), for: .touchUpInside)
         
-        nameLbl.text = TeamsViewModel().teams[0].name
-        foundedLbl.text = TeamsViewModel().teams[0].founded
-        jobLbl.text = TeamsViewModel().teams[0].manager.name
-        infoLbl.text = TeamsViewModel().teams[0].info
+        containerVw.backgroundColor = team.id.background
+        
+        badgeImgVw.image = team.id.badge
+        playbackBtn.setImage(team.isPlaying ? Assets.pause : Assets.play , for: .normal)
+        
+        nameLbl.text = team.name
+        foundedLbl.text = team.founded
+        jobLbl.text = "Current \(team.manager.job.rawValue): \(team.manager.name)"
+        infoLbl.text = team.info
         
         self.contentView.addSubview(containerVw)
         
@@ -127,6 +146,11 @@ class TeamTableViewCell: UITableViewCell {
             playbackBtn.centerYAnchor.constraint(equalTo: containerVw.centerYAnchor, constant: 8),
         ])
         
-        
+    }
+    
+    @objc func didTapPlayback() {
+        if let team = team {
+            delegate?.didTapPlayback(for: team)
+        }
     }
 }
